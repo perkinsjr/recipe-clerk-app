@@ -108,7 +108,7 @@ export default function Recipe({ recipe }) {
           passHref
           href={{ pathname: '/editrecipe', query: { id: recipe.id } }}
         >
-          <Button as="a" variant="ghost" variantColor="blue">
+          <Button as="a" variant="ghost">
             {' '}
             Edit Recipe{' '}
           </Button>
