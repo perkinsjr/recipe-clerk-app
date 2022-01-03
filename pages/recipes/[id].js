@@ -7,7 +7,8 @@ import {
   useColorModeValue
 } from '@chakra-ui/react'
 import Link from 'next/link'
-
+import { collection, getDocs, getDoc, doc } from 'firebase/firestore/lite'
+import { database } from '../../firebase'
 export default function Recipe({ recipe }) {
   const { title, description, ingredients, instructions, image, category } =
     recipe
@@ -120,69 +121,9 @@ export default function Recipe({ recipe }) {
 
 export async function getStaticProps({ params }) {
   const id = params.id
-  const recipes = [
-    {
-      id: '4',
-      title: 'Awesome Crab Roll',
-      description: 'Tastes just like mom used to make',
-      ingredients: 'Crab, Rice, Salt, Pepper',
-      instructions: 'Mix ingredients, roll, bake',
-      image:
-        'https://res.cloudinary.com/dub20ptvt/image/upload/v1641217989/Recipe%20App/yzt6ekukk0tvt4ipj9rg.jpg',
-      category: 'Appetizer',
-      prepTime: '10 minutes',
-      cookTime: '20 minutes',
-      servings: '4',
-      calories: '200'
-    },
-    {
-      id: '3',
-      title: 'Pizza',
-      description: 'super tastey',
-      ingredients: 'Pizza crust, Cheese, Sauce, Pepper',
-      instructions: 'Top crust with sauce, add your cheese, bake, eat',
-      image:
-        'https://res.cloudinary.com/dub20ptvt/image/upload/v1641217990/Recipe%20App/kn24c9af1suukkh5dvww.jpg',
-      category: 'Appetizer',
-      prepTime: '10 minutes',
-      cookTime: '20 minutes',
-      servings: '4',
-      calories: '200'
-    },
-    {
-      id: '2',
-      title: 'hot dog',
-      description: 'Tastes like freedom',
-      ingredients: 'hot dog, ketchup, mustard',
-      instructions:
-        'Take hot dog,cook on grill, put ketchup on top, put mustard on top',
-      image:
-        'https://res.cloudinary.com/dub20ptvt/image/upload/v1641217990/Recipe%20App/swzgd7lqpfsil9a045ri.jpg',
-      category: 'Appetizer',
-      prepTime: '10 minutes',
-      cookTime: '20 minutes',
-      servings: '4',
-      calories: '200'
-    },
-    {
-      id: '1',
-      title: 'chicken',
-      description: 'Great for meal prepping, super quick and easy',
-      ingredients: 'chicken, salt, pepper',
-      instructions:
-        'Trim fat, put a bunch of salt and pepper on it, and cook it',
-      image:
-        'https://res.cloudinary.com/dub20ptvt/image/upload/v1641217990/Recipe%20App/dnhuxb6uaoiytrbyka3g.jpg',
-      category: 'Appetizer',
-      prepTime: '10 minutes',
-      cookTime: '20 minutes',
-      servings: '4',
-      calories: '200'
-    }
-  ]
-
-  const recipe = recipes.find(recipe => recipe.id === id)
-  console.log(recipe)
+  const recipeSnapshot = await getDoc(doc(database, 'recipes', id))
+  const recipe = recipeSnapshot.data()
+  recipe.id = recipeSnapshot.id
   return {
     props: {
       recipe
@@ -191,66 +132,13 @@ export async function getStaticProps({ params }) {
 }
 
 export async function getStaticPaths() {
-  const recipes = [
-    {
-      id: '4',
-      title: 'Awesome Crab Roll',
-      description: 'Tastes just like mom used to make',
-      ingredients: 'Crab, Rice, Salt, Pepper',
-      instructions: 'Mix ingredients, roll, bake',
-      image:
-        'https://res.cloudinary.com/dub20ptvt/image/upload/v1641217989/Recipe%20App/yzt6ekukk0tvt4ipj9rg.jpg',
-      category: 'Appetizer',
-      prepTime: '10 minutes',
-      cookTime: '20 minutes',
-      servings: '4',
-      calories: '200'
-    },
-    {
-      id: '3',
-      title: 'Pizza',
-      description: 'super tastey',
-      ingredients: 'Pizza crust, Cheese, Sauce, Pepper',
-      instructions: 'Top crust with sauce, add your cheese, bake, eat',
-      image:
-        'https://res.cloudinary.com/dub20ptvt/image/upload/v1641217990/Recipe%20App/kn24c9af1suukkh5dvww.jpg',
-      category: 'Appetizer',
-      prepTime: '10 minutes',
-      cookTime: '20 minutes',
-      servings: '4',
-      calories: '200'
-    },
-    {
-      id: '2',
-      title: 'hot dog',
-      description: 'Tastes like freedom',
-      ingredients: 'hot dog, ketchup, mustard',
-      instructions:
-        'Take hot dog,cook on grill, put ketchup on top, put mustard on top',
-      image:
-        'https://res.cloudinary.com/dub20ptvt/image/upload/v1641217990/Recipe%20App/swzgd7lqpfsil9a045ri.jpg',
-      category: 'Appetizer',
-      prepTime: '10 minutes',
-      cookTime: '20 minutes',
-      servings: '4',
-      calories: '200'
-    },
-    {
-      id: '1',
-      title: 'chicken',
-      description: 'Great for meal prepping, super quick and easy',
-      ingredients: 'chicken, salt, pepper',
-      instructions:
-        'Trim fat, put a bunch of salt and pepper on it, and cook it',
-      image:
-        'https://res.cloudinary.com/dub20ptvt/image/upload/v1641217990/Recipe%20App/dnhuxb6uaoiytrbyka3g.jpg',
-      category: 'Appetizer',
-      prepTime: '10 minutes',
-      cookTime: '20 minutes',
-      servings: '4',
-      calories: '200'
-    }
-  ]
+  const recipeCollection = collection(database, 'recipes')
+  const recipeSnapshot = await getDocs(recipeCollection)
+  const recipes = recipeSnapshot.docs.map(doc => {
+    const data = doc.data()
+    data.id = doc.id
+    return data
+  })
   const paths = recipes.map(recipe => ({
     params: {
       id: recipe.id
