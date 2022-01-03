@@ -11,12 +11,20 @@ import {
 } from '@chakra-ui/react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { collection, getDocs, getDoc, doc } from 'firebase/firestore/lite'
+import {
+  collection,
+  getDocs,
+  getDoc,
+  doc,
+  updateDoc
+} from 'firebase/firestore/lite'
+import { useUser } from '@clerk/nextjs'
 import { database } from '../firebase'
 import { useState, useEffect } from 'react'
-
+import { getAuth, signInWithCustomToken } from 'firebase/auth'
 export default function EditRecipe() {
   const router = useRouter()
+  const user = useUser()
   const id = router.query.id
   const [recipe, setRecipe] = useState({})
   useEffect(() => {
@@ -35,7 +43,14 @@ export default function EditRecipe() {
       [e.target.name]: e.target.value
     })
   }
+  const handleSubmit = async e => {
+    const firebaseClerkToken = await user.getToken('firebase')
+    const auth = getAuth()
+    await signInWithCustomToken(auth, firebaseClerkToken)
 
+    const result = await updateDoc(doc(database, 'recipes', id), recipe)
+    router.push('/')
+  }
   return (
     <Flex justifyContent="center" alignItems="center" flexDirection="column">
       <Heading as="h1" fontSize="7xl" textAlign="center">
@@ -44,7 +59,7 @@ export default function EditRecipe() {
       <form
         onSubmit={e => {
           e.preventDefault()
-          console.log(recipe)
+          handleSubmit()
         }}
       >
         <Grid

@@ -40,8 +40,19 @@ export default function AddRecipe() {
     const auth = getAuth()
     await signInWithCustomToken(auth, firebaseClerkToken)
 
-    const result = await await addDoc(collection(database, 'recipes'), recipe)
-    console.log(result)
+    const result = await addDoc(collection(database, 'recipes'), recipe)
+    setRecipe({
+      title: '',
+      description: '',
+      ingredients: '',
+      instructions: '',
+      image: '',
+      category: '',
+      prepTime: '',
+      cookTime: '',
+      servings: '',
+      calories: ''
+    })
   }
   return (
     <Flex justifyContent="center" alignItems="center" flexDirection="column">
