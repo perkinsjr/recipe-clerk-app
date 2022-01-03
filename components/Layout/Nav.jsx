@@ -2,7 +2,7 @@ import { Box, Center, Text, useColorModeValue as mode } from '@chakra-ui/react'
 import { Navbar } from './Navbar'
 import { NavLink } from './NavLink'
 import { UserProfile } from './UserProfile'
-
+import { SignIn, SignedOut, UserButton } from '@clerk/nextjs'
 export const Nav = () => (
   <Box bg={mode('gray.50', 'gray.700')}>
     <Navbar>
@@ -16,11 +16,7 @@ export const Nav = () => (
         <NavLink href="/addrecipe">Add Recipe</NavLink>]
       </Navbar.Links>
       <Navbar.UserProfile>
-        <UserProfile
-          name="James Perkins"
-          avatarUrl="https://pbs.twimg.com/profile_images/1478005071824756739/nVK4l2pR_400x400.jpg"
-          email="jamesperkins@hey.com"
-        />
+        <UserButton />
       </Navbar.UserProfile>
     </Navbar>
   </Box>
