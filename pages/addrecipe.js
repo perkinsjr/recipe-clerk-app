@@ -11,8 +11,12 @@ import {
 } from '@chakra-ui/react'
 import Link from 'next/link'
 import { useState } from 'react'
-
+import { useUser } from '@clerk/nextjs'
+import { getAuth, signInWithCustomToken } from 'firebase/auth'
+import { collection, getDocs, addDoc } from 'firebase/firestore/lite'
+import { database } from '../firebase'
 export default function AddRecipe() {
+  const user = useUser()
   const [recipe, setRecipe] = useState({
     title: '',
     description: '',
@@ -31,7 +35,14 @@ export default function AddRecipe() {
       [e.target.name]: e.target.value
     })
   }
+  const handleSubmit = async e => {
+    const firebaseClerkToken = await user.getToken('firebase')
+    const auth = getAuth()
+    await signInWithCustomToken(auth, firebaseClerkToken)
 
+    const result = await await addDoc(collection(database, 'recipes'), recipe)
+    console.log(result)
+  }
   return (
     <Flex justifyContent="center" alignItems="center" flexDirection="column">
       <Heading as="h1" fontSize="7xl" textAlign="center">
@@ -40,7 +51,7 @@ export default function AddRecipe() {
       <form
         onSubmit={e => {
           e.preventDefault()
-          console.log(recipe)
+          handleSubmit()
         }}
       >
         <Grid

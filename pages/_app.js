@@ -18,7 +18,10 @@ function MyApp({ Component, pageProps }) {
     <ClerkProvider>
       <ChakraProvider>
         {isPublicPage ? (
-          <Component {...pageProps} />
+          <>
+            <Nav />
+            <Component {...pageProps} />
+          </>
         ) : (
           <>
             <SignedIn>
